@@ -1,4 +1,4 @@
-pub use dfb::*;
+use dfb::*;
 
 use super::{AnySender, AnyRecvError};
 use core::any::*;
