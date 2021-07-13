@@ -1,0 +1,22 @@
+[package]
+name = "any-mpsc"
+version = "0.1.0"
+edition = "2018"
+authors = ["Griffin O'Neill <gsoneill1003@gmail.com>"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+description = """
+An mpsc that allows arbitrary types to be passed through
+"""
+keywords = ["mpsc", "wrapper", "dynamic", "fifo"]
+homepage = "https://github.com/Eolu/any_mpsc"
+repository = "https://github.com/Eolu/any_mpsc"
+categories = ["asynchronous", "data-structures"]
+documentation = "https://docs.rs/any-mpsc"
+
+[features]
+default = ["buf_recv"]
+buf_recv = []
+
+[dependencies]
+dfb = "1.0"
