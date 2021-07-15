@@ -39,7 +39,7 @@ impl BufferedReceiver
                     Err(r) => 
                     {
                         let err = Err(BufRecvError::WrongType(r.as_ref().type_id()));
-                        self.buf.insert(r);
+                        self.buf.insert_dyn(r);
                         err
                     },
                 })
@@ -60,7 +60,7 @@ impl BufferedReceiver
                 Err(r) => 
                 {
                     let err = Err(BufRecvError::WrongType(r.as_ref().type_id()));
-                    self.buf.insert(r);
+                    self.buf.insert_dyn(r);
                     err
                 },
             })
@@ -83,7 +83,7 @@ impl BufferedReceiver
                     Err(r) => 
                     {
                         let err = Err(BufRecvError::WrongType(r.as_ref().type_id()));
-                        self.buf.insert(r);
+                        self.buf.insert_dyn(r);
                         err
                     }
                 })
@@ -107,7 +107,7 @@ impl BufferedReceiver
                     Err(r) => 
                     {
                         let err = Err(BufRecvError::WrongType(r.as_ref().type_id()));
-                        self.buf.insert(r);
+                        self.buf.insert_dyn(r);
                         err
                     }
                 })
@@ -131,7 +131,7 @@ impl BufferedReceiver
                     Err(r) => 
                     {
                         let err = Err(BufRecvError::WrongType(r.as_ref().type_id()));
-                        self.buf.insert(r);
+                        self.buf.insert_dyn(r);
                         err
                     }
                 })
@@ -155,7 +155,7 @@ impl BufferedReceiver
                     Err(r) => 
                     {
                         let err = Err(BufRecvError::WrongType(r.as_ref().type_id()));
-                        self.buf.insert(r);
+                        self.buf.insert_dyn(r);
                         err
                     }
                 })

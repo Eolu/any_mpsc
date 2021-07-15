@@ -113,9 +113,32 @@ mod tests
     #[test]
     pub fn any_channel_test_2()
     {
-        let to_send: f32 = 55.7;
+        let to_send = 55.7f32;
         let (atx, arx) = channel();
         atx.send(to_send).unwrap();
         println!("{:?}", arx.recv::<f32>());
+    }
+
+    #[test]
+    pub fn readme_test()
+    {
+        fn receive_handler<T: std::fmt::Debug + 'static>(rx: &mut BufferedReceiver)
+        {
+            match rx.recv::<T>()
+            {
+                Ok(result) => println!("{:?}", result),
+                Err(BufRecvError::WrongType(type_id)) => println!("Type with id {:?} added to buffer", type_id),
+                Err(e) => eprintln!("{:?}", e)
+            }
+        }
+        
+        let (tx, mut rx) = crate::buffered_channel();
+        
+        tx.send(55.7f32).unwrap();
+        tx.send(String::from("example")).unwrap();
+        
+        receive_handler::<f32>(&mut rx);
+        receive_handler::<f32>(&mut rx);
+        receive_handler::<String>(&mut rx);
     }
 }
