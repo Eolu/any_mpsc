@@ -47,8 +47,8 @@ Type with id TypeId { t: 7854412396444247302 } added to buffer
 |`recv_timeout_live`|Calls mpsc recv_timeout regardless of whether or not the buffer is empty. Unmatching result types will still be placed in the buffer.|
 |`try_recv_live`|Calls mpsc try_recv regardless of whether or not the buffer is empty. Unmatching result types will still be placed in the buffer.|
 |`recv_nobuf`|Equivalent to `AnyReceiver::recv` (bypasses the buffer entirely)|
-|`recv_timeout_nobuf`|Equivalent to `AnyReceiver::recv_timeout_nobuf` (bypasses the buffer entirely)|
-|`try_recv_nobuf`|Equivalent to `AnyReceiver::try_recv_nobuf` (bypasses the buffer entirely)|
+|`recv_timeout_nobuf`|Equivalent to `AnyReceiver::recv_timeout` (bypasses the buffer entirely)|
+|`try_recv_nobuf`|Equivalent to `AnyReceiver::try_recv` (bypasses the buffer entirely)|
 |`recv_buf`|Attempts to pop from the internal buffer. Never attempts to access the internal channel at all.|
 
 # Upcoming features
