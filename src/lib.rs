@@ -110,7 +110,20 @@ impl Display for AnyRecvError
         }
     }
 }
-impl Error for AnyRecvError {}
+
+impl Error for AnyRecvError 
+{
+    fn source(&self) -> Option<&(dyn Error + 'static)>
+    {
+        match self
+        {
+            AnyRecvError::RecvError(err) => Some(err),
+            AnyRecvError::RecvTimeoutError(err) => Some(err),
+            AnyRecvError::TryRecvError(err) => Some(err),
+            _ => None
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests 
