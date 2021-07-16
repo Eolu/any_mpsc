@@ -37,9 +37,9 @@ The output is this:
 Type with id TypeId { t: 7854412396444247302 } added to buffer
 "example"
 ```
-
 |Method|Description|
 |-|-|
+|`recv_until`|Will continuously recv until the supplied generic type is found. Any unmatching types received are placed in the buffer.|
 |`recv`|Attempts to pop from internal buffer. If buffer is empty, calls mpsc recv|
 |`recv_timeout`|Attempts to pop from internal buffer. If buffer is empty, calls mpsc recv_timeout|
 |`try_recv`|Attempts to pop from internal buffer. If buffer is empty, calls mpsc try_recv|

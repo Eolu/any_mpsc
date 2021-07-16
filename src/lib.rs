@@ -16,6 +16,7 @@ pub fn channel() -> (AnySender, AnyReceiver)
 /// Wraps an [mpsc::Sender] to support dynamic typing.
 #[derive(Debug)]
 pub struct AnySender(pub Sender<Box<dyn Any>>);
+unsafe impl Send for AnySender {}
 
 impl AnySender
 {
@@ -29,6 +30,7 @@ impl AnySender
 /// Wraps an [mpsc::Receiver] to support dynamic typing.
 #[derive(Debug)]
 pub struct AnyReceiver(pub Receiver<Box<dyn Any>>);
+unsafe impl Send for AnyReceiver {}
 
 impl AnyReceiver
 {
@@ -177,5 +179,32 @@ mod tests
         receive_handler::<f32>(&mut rx);
         receive_handler::<f32>(&mut rx);
         receive_handler::<String>(&mut rx);
+    }
+
+    #[test]
+    #[cfg(feature = "buf_recv")]
+    pub fn recv_until_test()
+    {
+        use std::thread;
+        fn receive_handler<T: std::fmt::Debug + 'static>(rx: &mut BufferedReceiver)
+        {
+            match rx.recv_until::<T>()
+            {
+                Ok(result) => println!("{:?}", result),
+                Err(e) => eprintln!("{:?}", e)
+            }
+        }
+        
+        let (tx, mut rx) = crate::buffered_channel();
+
+        thread::spawn(move || 
+        {
+            receive_handler::<String>(&mut rx);
+            receive_handler::<f32>(&mut rx);
+        });
+        
+        tx.send(55.7f32).unwrap();
+        tx.send(String::from("example")).unwrap();
+    
     }
 }

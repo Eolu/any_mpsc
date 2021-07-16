@@ -19,9 +19,29 @@ pub struct BufferedReceiver
     pub rx: Receiver<Box<dyn Any>>,
     pub buf: Dfb
 }
+unsafe impl Send for BufferedReceiver {}
 
 impl BufferedReceiver
 {
+    /// Wraps [mpsc::Receiver::recv]. See [BufRecvError] for details on the 
+    /// return value. Will continuously recv until the supplied type is found. 
+    /// Any unmatching types received will be placed in the buffer.
+    pub fn recv_until<T: 'static>(&mut self) -> Result<T, AnyRecvError>
+    {
+        loop
+        {
+            match self.recv::<T>()
+            {
+                Err(err) => match err
+                {
+                    AnyRecvError::BufRecvError(_type_id) => continue,
+                    err => break Err(err),
+                },
+                ok => break ok
+            }
+        }
+    }
+
     /// Wraps [mpsc::Receiver::recv]. See [BufRecvError] for details on the 
     /// return value. Will attempt to take from the internal buffer before
     /// performing an actual channel recv.
