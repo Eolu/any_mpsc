@@ -5,7 +5,7 @@ A wrapper for an `mpsc::channel` that allows arbitrary types to be passed throug
 The `any_mpsc::channel` function may be used to create a basic `(AnySender, AnyReceiver)`. `AnySender` takes any value and sends it through the underlying channel with the `send` method (internally as a `Box<dyn Any>`). `AnyReceiver` contains generic versions of `recv`, `recv_timeout`, and `try_recv`. If the generic parameter supplied doesn't correspond with the type the `AnySender` pushed through, a `AnyRecvError::WrongType(Box<dyn Any>)` will be returned containing the value.
 
 ### any_mpsc::buffered_channel
-Probably more useful, the `buf_recv` default feature enables the `any_mpsc::buffered_channel` function. This will return a `(AnySender, BufferedReceiver)`. The `BufferedReceiver` works differently from the `AnyReceiver` in that if an unmatching generic type is supplied, it will instead return a `BufRecvError::WrongType(TypeId)`. The actual value will be stored in its internal buffer, and the next time `recv`, `recv_timeout`, or `try_recv` is called with a generic parameter matching its type, that buffered value will be returned and removed from the buffer. Additional methods for interaction with the channel and buffer exist, see the table at the bottom of this section.
+Probably more useful, the `buf_recv` default feature enables the `any_mpsc::buffered_channel` function. This will return a `(AnySender, BufferedReceiver)`. The `BufferedReceiver` works differently from the `AnyReceiver` in that if an unmatching generic type is supplied, it will instead return a `AnyRecvError::BufRecvError(TypeId)`. The actual value will be stored in its internal buffer, and the next time `recv`, `recv_timeout`, or `try_recv` is called with a generic parameter matching its type, that buffered value will be returned and removed from the buffer. Additional methods for interaction with the channel and buffer exist, see the table at the bottom of this section.
 
 Example:
 
@@ -16,7 +16,7 @@ fn receive_handler<T: Debug + 'static>(rx: &mut BufferedReceiver)
     match rx.recv::<T>()
     {
         Ok(result) => println!("{:?}", result),
-        Err(BufRecvError::WrongType(type_id)) => println!("Type with id {:?} added to buffer", type_id),
+        Err(AnyRecvError::BufRecvError(type_id)) => println!("Type with id {:?} added to buffer", type_id),
         Err(e) => eprintln!("{:?}", e)
     }
 }
