@@ -51,5 +51,3 @@ Type with id TypeId { t: 7854412396444247302 } added to buffer
 |`try_recv_nobuf`|Equivalent to `AnyReceiver::try_recv` (bypasses the buffer entirely)|
 |`recv_buf`|Attempts to pop from the internal buffer. Never attempts to access the internal channel at all.|
 
-# Upcoming features
-- Will create a trait to abstract away the differences between `channel` and `buffered_channel`, allowing you to replace a channel with a buffered channel (but not necessarily vice versa, as buffered_channel has additional API).

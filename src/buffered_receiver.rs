@@ -25,20 +25,20 @@ impl BufferedReceiver
     /// Wraps [mpsc::Receiver::recv]. See [BufRecvError] for details on the 
     /// return value. Will attempt to take from the internal buffer before
     /// performing an actual channel recv.
-    pub fn recv<T: 'static>(&mut self) -> Result<T, BufRecvError>
+    pub fn recv<T: 'static>(&mut self) -> Result<T, AnyRecvError>
     {
         match self.buf.remove::<T>()
         {
             Some(t) => Ok(t),
             None => self.rx
                 .recv()
-                .map_err(BufRecvError::RecvError)
+                .map_err(AnyRecvError::RecvError)
                 .and_then(|r| match r.downcast()
                 {
                     Ok(r) => Ok(*r),
                     Err(r) => 
                     {
-                        let err = Err(BufRecvError::WrongType(r.as_ref().type_id()));
+                        let err = Err(AnyRecvError::BufRecvError(r.as_ref().type_id()));
                         self.buf.insert_dyn(r);
                         err
                     },
@@ -49,17 +49,17 @@ impl BufferedReceiver
     /// Wraps [mpsc::Receiver::recv]. See [BufRecvError] for details on the 
     /// return value. Will perform a channel recv regardless of whether or not
     /// anything is contained in the buffer.
-    pub fn recv_live<T: 'static>(&mut self) -> Result<T, BufRecvError>
+    pub fn recv_live<T: 'static>(&mut self) -> Result<T, AnyRecvError>
     {
         self.rx
             .recv()
-            .map_err(BufRecvError::RecvError)
+            .map_err(AnyRecvError::RecvError)
             .and_then(|r| match r.downcast()
             {
                 Ok(r) => Ok(*r),
                 Err(r) => 
                 {
-                    let err = Err(BufRecvError::WrongType(r.as_ref().type_id()));
+                    let err = Err(AnyRecvError::BufRecvError(r.as_ref().type_id()));
                     self.buf.insert_dyn(r);
                     err
                 },
@@ -69,20 +69,20 @@ impl BufferedReceiver
     /// Wraps [mpsc::Receiver::recv_timeout]. See [BufRecvError] for 
     /// details on the return value. Will attempt to take from the internal 
     /// buffer before performing an actual channel recv_timeout.
-    pub fn recv_timeout<T: 'static>(&mut self, timeout: std::time::Duration) -> Result<T, BufRecvError>
+    pub fn recv_timeout<T: 'static>(&mut self, timeout: std::time::Duration) -> Result<T, AnyRecvError>
     {
         match self.buf.remove::<T>()
         {
             Some(t) => Ok(t),
             None => self.rx
                 .recv_timeout(timeout)
-                .map_err(BufRecvError::RecvTimeoutError)
+                .map_err(AnyRecvError::RecvTimeoutError)
                 .and_then(|r| match r.downcast()
                 {
                     Ok(r) => Ok(*r),
                     Err(r) => 
                     {
-                        let err = Err(BufRecvError::WrongType(r.as_ref().type_id()));
+                        let err = Err(AnyRecvError::BufRecvError(r.as_ref().type_id()));
                         self.buf.insert_dyn(r);
                         err
                     }
@@ -93,20 +93,20 @@ impl BufferedReceiver
     /// Wraps [mpsc::Receiver::recv_timeout]. See [BufRecvError] for 
     /// details on the return value. Will perform a channel recv_timeout 
     /// regardless of whether or not anything is contained in the buffer.
-    pub fn recv_timeout_live<T: 'static>(&mut self, timeout: std::time::Duration) -> Result<T, BufRecvError>
+    pub fn recv_timeout_live<T: 'static>(&mut self, timeout: std::time::Duration) -> Result<T, AnyRecvError>
     {
         match self.buf.remove::<T>()
         {
             Some(t) => Ok(t),
             None => self.rx
                 .recv_timeout(timeout)
-                .map_err(BufRecvError::RecvTimeoutError)
+                .map_err(AnyRecvError::RecvTimeoutError)
                 .and_then(|r| match r.downcast()
                 {
                     Ok(r) => Ok(*r),
                     Err(r) => 
                     {
-                        let err = Err(BufRecvError::WrongType(r.as_ref().type_id()));
+                        let err = Err(AnyRecvError::BufRecvError(r.as_ref().type_id()));
                         self.buf.insert_dyn(r);
                         err
                     }
@@ -117,20 +117,20 @@ impl BufferedReceiver
     /// Wraps [mpsc::Receiver::try_recv]. See [BufRecvError] for 
     /// details on the return value. Will attempt to take from the internal 
     /// buffer before performing an actual channel recv_timeout.
-    pub fn try_recv<T: 'static>(&mut self) -> Result<T, BufRecvError>
+    pub fn try_recv<T: 'static>(&mut self) -> Result<T, AnyRecvError>
     {
         match self.buf.remove::<T>()
         {
             Some(t) => Ok(t),
             None => self.rx
                 .try_recv()
-                .map_err(BufRecvError::TryRecvError)
+                .map_err(AnyRecvError::TryRecvError)
                 .and_then(|r| match r.downcast()
                 {
                     Ok(r) => Ok(*r),
                     Err(r) => 
                     {
-                        let err = Err(BufRecvError::WrongType(r.as_ref().type_id()));
+                        let err = Err(AnyRecvError::BufRecvError(r.as_ref().type_id()));
                         self.buf.insert_dyn(r);
                         err
                     }
@@ -141,20 +141,20 @@ impl BufferedReceiver
     /// Wraps [mpsc::Receiver::try_recv]. See [BufRecvError] for 
     /// details on the return value. Will perform a channel recv_timeout 
     /// regardless of whether or not anything is contained in the buffer.
-    pub fn try_recv_live<T: 'static>(&mut self) -> Result<T, BufRecvError>
+    pub fn try_recv_live<T: 'static>(&mut self) -> Result<T, AnyRecvError>
     {
         match self.buf.remove::<T>()
         {
             Some(t) => Ok(t),
             None => self.rx
                 .try_recv()
-                .map_err(BufRecvError::TryRecvError)
+                .map_err(AnyRecvError::TryRecvError)
                 .and_then(|r| match r.downcast()
                 {
                     Ok(r) => Ok(*r),
                     Err(r) => 
                     {
-                        let err = Err(BufRecvError::WrongType(r.as_ref().type_id()));
+                        let err = Err(AnyRecvError::BufRecvError(r.as_ref().type_id()));
                         self.buf.insert_dyn(r);
                         err
                     }
@@ -206,27 +206,13 @@ impl BufferedReceiver
 
     /// Will attempt to read a value from the internal buffer. Will not do a
     /// channel recv of any kind even if the buffer is empty.
-    pub fn recv_buf<T: 'static>(&mut self) -> Result<T, BufRecvError>
+    pub fn recv_buf<T: 'static>(&mut self) -> Result<T, AnyRecvError>
     {
         match self.buf.remove::<T>()
         {
             Some(t) => Ok(t),
-            None => Err(BufRecvError::EmptyBuffer)
+            None => Err(AnyRecvError::EmptyBuffer)
         }
     }
 }
 
-/// Error type for receievers. If an [mpsc] error occurs, it will be wrapped
-/// by an appropriate wrapper variant. If receiver is supplied an incorrect type, 
-/// a [BufRecvError::WrongType(TypeId)] will be returned and the result will be 
-/// stored in a buffer. If [BufferedReceiver::recv_buf] is called with an empty
-/// buffer, EmptyBuffer will be returned
-#[derive(Debug)]
-pub enum BufRecvError
-{
-    RecvError(mpsc::RecvError),
-    RecvTimeoutError(mpsc::RecvTimeoutError),
-    TryRecvError(mpsc::TryRecvError),
-    WrongType(TypeId),
-    EmptyBuffer
-}

@@ -4,7 +4,7 @@ mod buffered_receiver;
 pub use buffered_receiver::*;
 
 use core::any::*;
-use std::sync::mpsc::{self, Sender, Receiver};
+use std::{error::Error, fmt::Display, sync::mpsc::{self, Sender, Receiver}};
 
 /// An [mpsc::channel] that supports dynamic typing.
 pub fn channel() -> (AnySender, AnyReceiver)
@@ -78,16 +78,39 @@ impl AnyReceiver
 /// Error type for receievers. If an [mpsc] error occurs, it will be wrapped
 /// by an appropriate wrapper variant. If receiver is supplied an incorrect type, 
 /// a [AnyRecvError::WrongType(Box<dyn Any>)] will be returned containing the result 
-/// that did not successfully downcast.
+/// that did not successfully downcast. If buffered receiver is supplied an 
+/// incorrect type, a [BufRecvError::WrongType(TypeId)] will be returned and the 
+/// result will be stored in a buffer. If [BufferedReceiver::recv_buf] is called
+/// with an empty buffer, EmptyBuffer will be returned
 #[derive(Debug)]
 pub enum AnyRecvError
 {
     RecvError(mpsc::RecvError),
     RecvTimeoutError(mpsc::RecvTimeoutError),
     TryRecvError(mpsc::TryRecvError),
-    WrongType(Box<dyn Any>)
+    WrongType(Box<dyn Any>),
+    #[cfg(feature = "buf_recv")]
+    BufRecvError(TypeId),
+    #[cfg(feature = "buf_recv")]
+    EmptyBuffer
 }
 
+impl Display for AnyRecvError
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result 
+    {
+        match self
+        {
+            AnyRecvError::RecvError(err) => err.fmt(f), 
+            AnyRecvError::RecvTimeoutError(err) => err.fmt(f),
+            AnyRecvError::TryRecvError(err) => err.fmt(f),
+            AnyRecvError::WrongType(_) => write!(f, "Received wrong type"),
+            AnyRecvError::BufRecvError(type_id) => write!(f, "Received wrong type: {:?}", type_id),
+            AnyRecvError::EmptyBuffer => write!(f, "Buffer is empty"),
+        }
+    }
+}
+impl Error for AnyRecvError {}
 
 #[cfg(test)]
 mod tests 
@@ -122,12 +145,13 @@ mod tests
     #[test]
     pub fn readme_test()
     {
+        use buffered_receiver::*;
         fn receive_handler<T: std::fmt::Debug + 'static>(rx: &mut BufferedReceiver)
         {
             match rx.recv::<T>()
             {
                 Ok(result) => println!("{:?}", result),
-                Err(BufRecvError::WrongType(type_id)) => println!("Type with id {:?} added to buffer", type_id),
+                Err(AnyRecvError::BufRecvError(type_id)) => println!("Type with id {:?} added to buffer", type_id),
                 Err(e) => eprintln!("{:?}", e)
             }
         }
