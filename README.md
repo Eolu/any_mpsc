@@ -17,7 +17,7 @@ fn receive_handler<T: Debug + 'static>(rx: &mut BufferedReceiver)
     {
         Ok(result) => println!("{:?}", result),
         Err(AnyRecvError::BufRecvError(type_id)) => println!("Type with id {:?} added to buffer", type_id),
-        Err(e) => eprintln!("{:?}", e)
+        Err(e) => eprintln!("{}", e)
     }
 }
 
