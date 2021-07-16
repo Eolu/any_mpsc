@@ -156,9 +156,9 @@ mod tests
     }
 
     #[test]
+    #[cfg(feature = "buf_recv")]
     pub fn readme_test()
     {
-        use buffered_receiver::*;
         fn receive_handler<T: std::fmt::Debug + 'static>(rx: &mut BufferedReceiver)
         {
             match rx.recv::<T>()
