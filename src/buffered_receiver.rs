@@ -6,6 +6,7 @@ use std::sync::mpsc::{self, Receiver};
 
 /// An [mpsc::channel] that supports dynamic typing and contains a buffer to 
 /// prevent the need for dynamic types to be exposed. 
+#[inline]
 pub fn buffered_channel() -> (AnySender, BufferedReceiver)
 {
     let (tx, rx) = mpsc::channel();
@@ -45,6 +46,7 @@ impl BufferedReceiver
     /// Wraps [mpsc::Receiver::recv]. See [BufRecvError] for details on the 
     /// return value. Will attempt to take from the internal buffer before
     /// performing an actual channel recv.
+    #[inline]
     pub fn recv<T: 'static>(&mut self) -> Result<T, AnyRecvError>
     {
         match self.buf.remove::<T>()
@@ -69,6 +71,7 @@ impl BufferedReceiver
     /// Wraps [mpsc::Receiver::recv]. See [BufRecvError] for details on the 
     /// return value. Will perform a channel recv regardless of whether or not
     /// anything is contained in the buffer.
+    #[inline]
     pub fn recv_live<T: 'static>(&mut self) -> Result<T, AnyRecvError>
     {
         self.rx
@@ -89,6 +92,7 @@ impl BufferedReceiver
     /// Wraps [mpsc::Receiver::recv_timeout]. See [BufRecvError] for 
     /// details on the return value. Will attempt to take from the internal 
     /// buffer before performing an actual channel recv_timeout.
+    #[inline]
     pub fn recv_timeout<T: 'static>(&mut self, timeout: std::time::Duration) -> Result<T, AnyRecvError>
     {
         match self.buf.remove::<T>()
@@ -113,6 +117,7 @@ impl BufferedReceiver
     /// Wraps [mpsc::Receiver::recv_timeout]. See [BufRecvError] for 
     /// details on the return value. Will perform a channel recv_timeout 
     /// regardless of whether or not anything is contained in the buffer.
+    #[inline]
     pub fn recv_timeout_live<T: 'static>(&mut self, timeout: std::time::Duration) -> Result<T, AnyRecvError>
     {
         match self.buf.remove::<T>()
@@ -137,6 +142,7 @@ impl BufferedReceiver
     /// Wraps [mpsc::Receiver::try_recv]. See [BufRecvError] for 
     /// details on the return value. Will attempt to take from the internal 
     /// buffer before performing an actual channel recv_timeout.
+    #[inline]
     pub fn try_recv<T: 'static>(&mut self) -> Result<T, AnyRecvError>
     {
         match self.buf.remove::<T>()
@@ -161,6 +167,7 @@ impl BufferedReceiver
     /// Wraps [mpsc::Receiver::try_recv]. See [BufRecvError] for 
     /// details on the return value. Will perform a channel recv_timeout 
     /// regardless of whether or not anything is contained in the buffer.
+    #[inline]
     pub fn try_recv_live<T: 'static>(&mut self) -> Result<T, AnyRecvError>
     {
         match self.buf.remove::<T>()
@@ -184,6 +191,7 @@ impl BufferedReceiver
 
     /// Wraps [mpsc::Receiver::recv]. See [crate::AnyRecvError] for details on the 
     /// return value. Bypasses the buffer entirely.
+    #[inline]
     pub fn recv_nobuf<T: 'static>(&self) -> Result<T, AnyRecvError>
     {
         self.rx
@@ -198,6 +206,7 @@ impl BufferedReceiver
 
     /// Wraps [mpsc::Receiver::recv_timeout]. See [crate::AnyRecvError] for 
     /// details on the return value. Bypasses the buffer entirely.
+    #[inline]
     pub fn recv_timeout_nobuf<T: 'static>(&self, timeout: std::time::Duration) -> Result<T, AnyRecvError>
     {
         self.rx
@@ -212,6 +221,7 @@ impl BufferedReceiver
 
     /// Wraps [mpsc::Receiver::try_recv]. See [crate::AnyRecvError] for 
     /// details on the return value. Bypasses the buffer entirely.
+    #[inline]
     pub fn try_recv_nobuf<T: 'static>(&self) -> Result<T, AnyRecvError>
     {
         self.rx
@@ -226,6 +236,7 @@ impl BufferedReceiver
 
     /// Will attempt to read a value from the internal buffer. Will not do a
     /// channel recv of any kind even if the buffer is empty.
+    #[inline]
     pub fn recv_buf<T: 'static>(&mut self) -> Result<T, AnyRecvError>
     {
         match self.buf.remove::<T>()

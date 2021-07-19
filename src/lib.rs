@@ -7,6 +7,7 @@ use core::any::*;
 use std::{error::Error, fmt::Display, sync::mpsc::{self, Sender, Receiver}};
 
 /// An [mpsc::channel] that supports dynamic typing.
+#[inline]
 pub fn channel() -> (AnySender, AnyReceiver)
 {
     let (tx, rx) = mpsc::channel();
@@ -21,6 +22,7 @@ unsafe impl Send for AnySender {}
 impl AnySender
 {
     /// Wraps [mpsc::Sender::send].
+    #[inline]
     pub fn send<T: Any>(&self, t: T) -> Result<(), mpsc::SendError<Box<dyn Any>>>
     {
         self.0.send(Box::new(t))
@@ -36,6 +38,7 @@ impl AnyReceiver
 {
     /// Wraps [mpsc::Receiver::recv]. See [crate::AnyRecvError] for details on the 
     /// return value.
+    #[inline]
     pub fn recv<T: 'static>(&self) -> Result<T, AnyRecvError>
     {
         self.0
@@ -50,6 +53,7 @@ impl AnyReceiver
 
     /// Wraps [mpsc::Receiver::recv_timeout]. See [crate::AnyRecvError] for 
     /// details on the return value.
+    #[inline]
     pub fn recv_timeout<T: 'static>(&self, timeout: std::time::Duration) -> Result<T, AnyRecvError>
     {
         self.0
@@ -64,6 +68,7 @@ impl AnyReceiver
 
     /// Wraps [mpsc::Receiver::try_recv]. See [crate::AnyRecvError] for 
     /// details on the return value.
+    #[inline]
     pub fn try_recv<T: 'static>(&self) -> Result<T, AnyRecvError>
     {
         self.0
@@ -99,6 +104,7 @@ pub enum AnyRecvError
 
 impl Display for AnyRecvError
 {
+    #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result 
     {
         match self
@@ -115,6 +121,7 @@ impl Display for AnyRecvError
 
 impl Error for AnyRecvError 
 {
+    #[inline]
     fn source(&self) -> Option<&(dyn Error + 'static)>
     {
         match self
