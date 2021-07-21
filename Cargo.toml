@@ -1,6 +1,6 @@
 [package]
 name = "any-mpsc"
-version = "0.3.1"
+version = "0.4.0"
 edition = "2018"
 authors = ["Griffin O'Neill <gsoneill1003@gmail.com>"]
 license = "MIT OR Apache-2.0"
@@ -19,4 +19,4 @@ default = ["buf_recv"]
 buf_recv = []
 
 [dependencies]
-dfb = "1.1"
+dfb = "1.3"
